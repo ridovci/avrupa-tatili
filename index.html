@@ -3,561 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RIDVAN AVCI TUR - Avrupa Macerası</title>
+    <title>Avrupa Seyahati Lojistik Rehberi</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Calm Harmony (Light Slate/Gray background, Dark Slate text, Teal accents) -->
-    <!-- Application Structure Plan: A single-page dashboard design. A top navigation bar allows users to switch between cities, which dynamically renders the content below. Each city has its own section with an overview (key stats, must-dos) and a tabbed interface for the daily schedule and local logistics (transport, food). This structure breaks down a long, text-heavy itinerary into manageable, interactive chunks, prioritizing quick access to relevant daily information over a linear scroll. A dashboard chart provides a high-level visual summary of the trip's pacing. -->
-    <!-- Visualization & Content Choices: 
-- Trip Pacing: Report Info -> # of days per city. Goal -> Compare. Viz -> Donut Chart (Chart.js/Canvas). Interaction -> None (static view). Justification -> Provides an immediate visual summary of the trip's structure.
-- Daily Itinerary: Report Info -> List of activities for each day. Goal -> Organize & Track. Viz -> Structured HTML/Tailwind cards with Unicode icons. Interaction -> Checkboxes for completion. Justification -> Turns a static list into an interactive checklist, enhancing usability for families on the go.
-- City Logistics: Report Info -> Transportation card info, food recommendations. Goal -> Inform. Viz -> Tabbed content sections with clear headings and lists. Interaction -> None. Justification -> Separates logistical details from the daily schedule for easy reference.
-- Overall Route: Report Info -> Sequence of cities. Goal -> Inform/Navigate. Viz -> HTML/CSS progress-bar-style timeline. Interaction -> Clickable to navigate to city section. Justification -> Provides a constant visual anchor and navigation tool.
--->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .nav-link { transition: all 0.3s ease; }
-        .nav-link.active {
-            color: #0d9488;
-            border-bottom-color: #0d9488;
-            transform: translateY(-2px);
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
         }
-        .tab-link.active {
-            background-color: #0d9488;
-            color: white;
+        .country-section {
+            border-left: 4px solid;
+            padding-left: 2rem;
+            margin-bottom: 3rem;
         }
-        .content-section {
-            animation: fadeIn 0.5s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .chart-container {
+        .logistics-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            margin-bottom: 1.5rem;
             position: relative;
-            margin: auto;
-            height: 300px;
-            max-height: 300px;
-            width: 100%;
-            max-width: 300px;
+            overflow: hidden;
+        }
+        .logistics-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 8px;
+            height: 100%;
+        }
+        .card-hollanda::before { background-color: #118AB2; }
+        .card-belcika::before { background-color: #FF6B6B; }
+        .card-almanya::before { background-color: #06D6A0; }
+        .card-gundem::before { background-color: #8B5CF6; } /* Mor renk eklendi */
+
+        .detail-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+        .detail-icon {
+            flex-shrink: 0;
+            width: 1.5rem;
+            height: 1.5rem;
+            margin-right: 0.75rem;
+            font-size: 1.25rem;
+            line-height: 1.5rem;
+            text-align: center;
+        }
+        .detail-text strong {
+            color: #073B4C;
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800">
+<body class="bg-gray-50 text-gray-800">
 
-    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
-        <!-- Header -->
-        <header class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-teal-700"><span style="color: #009d91;
-    font-weight: bolder;
-    font-size: 45px;">RIDVAN AVCI TUR</span><BR>Avrupa Macerası: İnteraktif Gezi Planı</h1>
-            <p class="text-slate-600 mt-2">22 Temmuz - 2 Ağustos 2025<br>2 Aile, 4 Yetişkin - 4 Çocuk</p>
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+
+        <header class="text-center mb-12">
+             <h1 class="text-4xl md:text-5xl font-extrabold text-[#073B4C] mb-2">Rıdvan Avcı Tur Lojistik Rehberi</h1>
         </header>
 
-        <!-- Main Navigation -->
-        <nav class="mb-8 bg-white rounded-lg shadow-sm p-2 sticky top-2 z-10">
-            <ul id="main-nav" class="flex flex-wrap justify-center items-center gap-2 md:gap-4">
-                <!-- Nav links will be injected by JS -->
-            </ul>
-        </nav>
-
-        <!-- Main Content Area -->
-        <main id="main-content">
-            <!-- Content will be injected by JS -->
-        </main>
-    </div>
-
-    <!-- JS Templates -->
-    <template id="city-template">
-        <div class="content-section bg-white rounded-lg shadow-lg p-4 md:p-8">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Left Column: Overview -->
-                <div class="lg:col-span-1">
-                    <h2 class="text-3xl font-bold mb-2 flex items-center">
-                        <span class="city-flag mr-3 text-4xl"></span>
-                        <span class="city-name"></span>
-                    </h2>
-                    <p class="city-dates text-slate-500 mb-6"></p>
-                    
-                    <div class="mb-6">
-                        <h3 class="font-semibold text-lg mb-2 text-teal-700">Gezi Özeti</h3>
-                        <div class="space-y-2 text-slate-700">
-                           <div class="flex items-start"><span class="font-bold w-24">Konaklama:</span><span class="city-hotel"></span></div>
-                           <div class="flex items-start"><span class="font-bold w-24">Görülmesi Gerekenler:</span><span class="city-sights"></span></div>
-                           <div class="flex items-start"><span class="font-bold w-24">Tadılması Gerekenler:</span><span class="city-food"></span></div>
-                        </div>
+        <main>
+            <!-- Hollanda Bölümü -->
+            <div class="country-section" style="border-color: #118AB2;">
+                <h2 class="text-3xl font-bold mb-6 text-[#118AB2]">🇳🇱 Hollanda (22-24 Temmuz)</h2>
+                
+                <div class="logistics-card card-hollanda">
+                    <h3 class="text-xl font-bold mb-4">Amsterdam & Region Travel Ticket (A&RTT)</h3>
+                    <div class="detail-item">
+                        <div class="detail-icon">🎫</div>
+                        <div class="detail-text"><strong>Adet:</strong> 8 adet (Her biri 2 gün geçerli)</div>
                     </div>
-
-                    <h3 class="font-semibold text-lg mb-3 text-teal-700">Şehirlerde Kalış Süreleri</h3>
-                     <div class="chart-container">
-                        <canvas id="duration-chart"></canvas>
+                    <div class="detail-item">
+                        <div class="detail-icon">📍</div>
+                        <div class="detail-text"><strong>Nereden:</strong> Online olarak resmi satış noktalarından (örn: NS.nl, GVB).</div>
                     </div>
-
+                    <div class="detail-item">
+                        <div class="detail-icon">⚙️</div>
+                        <div class="detail-text"><strong>Nasıl:</strong> Online alım sonrası size gönderilen QR kodu/onayı, Schiphol Havalimanı'ndaki otomatlarda veya gişelerde okutarak fiziksel kartlarınızı teslim alın.</div>
+                    </div>
                 </div>
 
-                <!-- Right Column: Details -->
-                <div class="lg:col-span-2">
-                    <!-- Tabs -->
-                    <div class="mb-4 border-b border-slate-200">
-                        <nav id="city-tabs" class="flex flex-wrap -mb-px" aria-label="Tabs">
-                            <!-- Tab links will be injected by JS -->
-                        </nav>
+                <div class="logistics-card card-hollanda">
+                    <h3 class="text-xl font-bold mb-4">Giethoorn Günübirlik Biletleri</h3>
+                     <div class="detail-item">
+                        <div class="detail-icon">🚆</div>
+                        <div class="detail-text"><strong>Tren:</strong> Amsterdam Sloterdijk ↔ Steenwijk arası 4 Yetişkin + 4 Çocuk (Railrunner bileti). Online (NS web/app) veya istasyon otomatından alın.</div>
                     </div>
-                    <!-- Tab Content -->
-                    <div id="city-tab-content">
-                        <!-- Daily plans will be injected here -->
+                    <div class="detail-item">
+                        <div class="detail-icon">🚌</div>
+                        <div class="detail-text"><strong>Otobüs:</strong> Steenwijk istasyonunda şoförden (temassız kartla) veya otomatlardan alınır.</div>
                     </div>
                 </div>
             </div>
-        </div>
-    </template>
 
-    <template id="day-plan-template">
-        <div class="day-plan space-y-4">
-            <!-- Activities will be injected here -->
-        </div>
-    </template>
-    
-    <template id="logistics-template">
-         <div class="logistics-plan p-4 bg-slate-50 rounded-lg">
-            <h3 class="text-xl font-bold mb-4 text-teal-800">Ulaşım ve Biletler</h3>
-            <div class="transport-info space-y-3 text-slate-700"></div>
-            
-            <h3 class="text-xl font-bold mt-6 mb-4 text-teal-800">Lezzet Durakları</h3>
-            <div class="food-recommendations space-y-3 text-slate-700"></div>
-        </div>
-    </template>
+            <!-- Belçika Bölümü -->
+            <div class="country-section" style="border-color: #FF6B6B;">
+                <h2 class="text-3xl font-bold mb-6 text-[#FF6B6B]">🇧🇪 Belçika (25-27 Temmuz)</h2>
 
+                <div class="logistics-card card-belcika">
+                    <h3 class="text-xl font-bold mb-4">Brüksel Gidiş-Dönüş Tren Biletleri</h3>
+                    <div class="detail-item">
+                        <div class="detail-icon">📱</div>
+                        <div class="detail-text"><strong>Nereden:</strong> SNCB (Belçika Demiryolları) mobil uygulaması veya istasyon otomatları.</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-icon">👨‍👩‍👧‍👦</div>
+                        <div class="detail-text"><strong>Adet:</strong> Sadece 4 yetişkin için. 12 yaş altı çocuklar ücretsiz seyahat eder.</div>
+                    </div>
+                </div>
 
-    <script>
-    const travelData = {
-        amsterdam: {
-            name: "Amsterdam",
-            flag: "🇳🇱",
-            duration: "3 Gece, 4 Gün",
-            dates: "22 Temmuz - 25 Temmuz",
-            hotel: "XO Hotels Park West",
-            sights: "Rijksmuseum, Jordaan, Kanal Turu, Giethoorn",
-            food: "Pannenkoek, Kroket, Stroopwafel",
-            logistics: {
-                transport: `
-                    <p><strong class="text-slate-800">En Mantıklı Seçenek:</strong> <span class="font-semibold text-teal-700">GVB Grup Günü Bileti</span>.</p>
-                    <p>5 kişiye kadar geçerlidir ve 24 saat boyunca tüm GVB tramvay, otobüs ve metrolarında sınırsız seyahat imkanı sunar. İki adet grup bileti almanız en ekonomik çözümdür.</p>
-                    <p><strong class="text-slate-800">Nasıl Alınır?</strong> En kolay yol GVB mobil uygulamasıdır.</p>
-                `,
-                food: `
-                    <p><strong class="text-slate-800">Pannenkoek:</strong> Hollanda usulü büyük krepler. The Pancake Bakery popüler bir duraktır.</p>
-                    <p><strong class="text-slate-800">Kroket:</strong> Dışı çıtır, içi dolgulu bir atıştırmalık. Sokak lezzetlerinin vazgeçilmezidir.</p>
-                `
-            },
-            days: [
-                {
-                    title: "1. Gün: Varış",
-                    activities: [
-                        { time: "18:00", text: "Schiphol'a varış ve otele yerleşme", icon: "✈️" },
-                        { time: "20:00+", text: "Dam Meydanı ve Kraliyet Sarayı'nı (dışarıdan) keşfetme", icon: "🏰" },
-                        { time: "Akşam", text: "Akşam Yemeği: Pannenkoek veya Kroket denemesi", icon: "🍴" },
-                    ]
-                },
-                {
-                    title: "2. Gün: Kültür",
-                    activities: [
-                        { time: "Sabah", text: "Zaanse Schans", icon: "🌳" },
-                        { time: "Öğleden S.", text: "Jordaan Mahallesi'nin şirin sokaklarında yürüyüş", icon: "🚶‍♂️" },
-                        { time: "Öğleden S.", text: "Amsterdam Tarihi Merkezinde keşif gezisi", icon: "🚶‍♂️" },
-                        { time: "Akşamüstü",  text: "Rijksmuseum ziyareti", icon: "🏛️"},
-                    ]
-                },
-                {
-                    title: "3. Gün: Giethoorn",
-                    activities: [
-                        { time: "Tüm Gün", text: "Günübirlik Giethoorn gezisi ('Hollanda'nın Venedik'i')", icon: "🏞️" },
-                        { time: "Ulaşım", text: "Amsterdam Centraal → Steenwijk (Tren), sonra otobüs", icon: "🚂" },
-                        { time: "Aktivite", text: "Özel 'fısıltı teknesi' kiralayarak kanallarda gezinme", icon: "🚤" },
-                    ]
-                },
-                {
-                    title: "4. Gün: Ayrılış",
-                    activities: [
-                        { time: "09:55", text: "Brüksel'e hareket edecek tren için Merkez İstasyon'a geçiş", icon: "🚉" },
-                    ]
-                },
-            ]
-        },
-        brussels: {
-            name: "Brüksel & Bruges",
-            flag: "🇧🇪",
-            duration: "2 Gece, 3 Gün",
-            dates: "25 Temmuz - 27 Temmuz",
-            hotel: "ibis budget Hotel Brussels Airport (Diegem)",
-            sights: "Grand-Place, Manneken Pis, Bruges Kanal Turu, Atomium",
-            food: "Waffle, Çikolata, Moules-Frites",
-            logistics: {
-                transport: `
-                    <p><strong class="text-slate-800">Brüksel İçi:</strong> <span class="font-semibold text-teal-700">Brupass 1 Günlük Bilet</span>. Diegem'den kalkan SNCB trenlerini ve şehir içi STIB metro/tramvaylarını kapsar.</p>
-                    <p><strong class="text-slate-800">Bruges Günü:</strong> Ayrı bir SNCB tren bileti gereklidir. Cumartesi günü için %50 indirimli <span class="font-semibold text-teal-700">Weekend Ticket</span> en iyi seçenektir.</p>
-                `,
-                food: `
-                    <p><strong class="text-slate-800">Belçika Waffle:</strong> Brüksel (hafif ve çıtır) ve Liège (yoğun ve şekerli) türlerini de deneyin.</p>
-                    <p><strong class="text-slate-800">Çikolata:</strong> Neuhaus, Pierre Marcolini ve Godiva gibi markaların dükkanları Grand-Place çevresindedir.</p>
-                `
-            },
-            days: [
-                 {
-                    title: "4. Gün: Varış",
-                    activities: [
-                        { time: "Öğleden S.", text: "Diegem'deki otele yerleşme ve merkeze geçiş", icon: "🏨" },
-                        { time: "Akşamüstü", text: "Grand-Place'ın büyüleyici atmosferini keşfetme", icon: "🏛️" },
-                        { time: "Akşamüstü", text: "Manneken Pis heykelini ziyaret etme", icon: "⛲" },
-                        { time: "Akşam", text: "Akşam Yemeği: Waffle ve Çikolata tadımı", icon: "🍴" },
-                    ]
-                },
-                {
-                    title: "5. Gün: Bruges",
-                    activities: [
-                        { time: "Tüm Gün", text: "Günübirlik Bruges gezisi ('Kuzeyin Venedik'i')", icon: "🏰" },
-                        { time: "Sabah", text: "Brüksel'den trenle Bruges'e yolculuk (~1 saat)", icon: "🚂" },
-                        { time: "Aktivite", text: "Markt Meydanı, Belfry Kulesi ve Kanal Turu", icon: "🛶" },
-                        { time: "Aktivite", text: "Burg Meydanı ve Kutsal Kan Bazilikası ziyareti", icon: "⛪" },
-                    ]
-                },
-                {
-                    title: "6. Gün: Atomium",
-                    activities: [
-                        { time: "Sabah", text: "İkonik Atomium yapısını ziyaret", icon: "⚛️" },
-                        { time: "Öğleden S.", text: "Şehir merkezinde öğle yemeği ve serbest zaman", icon: "🛍️" },
-                        { time: "20:34", text: "Köln'e hareket edecek tren için Midi İstasyonu'na geçiş", icon: "🚉" },
-                    ]
-                },
-            ]
-        },
-        cologne: {
-            name: "Köln",
-            flag: "🇩🇪",
-            duration: "2 Gece, 2 Gün",
-            dates: "27 Temmuz - 29 Temmuz",
-            hotel: "Hotel Lyskirchen Köln",
-            sights: "Köln Katedrali (Dom), Çikolata Müzesi, Ren Nehri Turu",
-            food: "Kölsch Birası, Alman Yemekleri",
-            logistics: {
-                transport: `
-                    <p><strong class="text-slate-800">En Mantıklı Seçenek:</strong> <span class="font-semibold text-teal-700">KölnCard (Grup Bileti)</span>.</p>
-                    <p>Oteliniz çok merkezi olduğu için çoğu yere yürüyebilirsiniz. Ancak bu kart, Ren Nehri turu ve Çikolata Müzesi gibi yerlerde indirimler sağlar.</p>
-                `,
-                food: `
-                    <p><strong class="text-slate-800">Geleneksel Brauhaus:</strong> Früh am Dom veya Peters Brauhaus gibi aile dostu bira evlerinde yerel Kölsch birası ve doyurucu Alman yemeklerini deneyebilirsiniz.</p>
-                `
-            },
-            days: [
-                 {
-                    title: "6. Gün: Varış",
-                    activities: [
-                        { time: "22:15", text: "Köln'e varış ve otele yerleşme", icon: "🏨" },
-                        { time: "Gece", text: "Altstadt (Eski Şehir) çevresinde kısa bir yürüyüş", icon: "🚶‍♀️" },
-                    ]
-                },
-                {
-                    title: "7. Gün: Katedral",
-                    activities: [
-                        { time: "Sabah", text: "Görkemli Köln Katedrali'ni (Dom) keşfetme", icon: "⛪" },
-                        { time: "İsteğe Bağlı", text: "Katedralin Güney Kulesi'ne tırmanış (533 basamak)", icon: "🧗" },
-                        { time: "Öğleden S.", text: "Çocukların favorisi: Çikolata Müzesi ziyareti", icon: "🍫" },
-                        { time: "Akşam", text: "Ren Nehri kıyısında (Promenade) akşam yemeği", icon: "🍴" },
-                    ]
-                },
-                {
-                    title: "8. Gün: Nehir",
-                    activities: [
-                        { time: "Sabah", text: "1 saatlik Ren Nehri tekne turu ile şehri sudan görme", icon: "🛥️" },
-                        { time: "Öğleden S.", text: "Serbest zaman ve son hazırlıklar", icon: "🛍️" },
-                        { time: "16:00", text: "Hamburg'a hareket edecek tren için istasyona geçiş", icon: "🚉" },
-                    ]
-                },
-            ]
-        },
-        hamburg: {
-            name: "Hamburg",
-            flag: "🇩🇪",
-            duration: "2 Gece, 2 Gün",
-            dates: "29 Temmuz - 31 Temmuz",
-            hotel: "a&o Hamburg City",
-            sights: "Miniatur Wunderland, Elbphilharmonie, Landungsbrücken",
-            food: "Fischbrötchen",
-            logistics: {
-                transport: `
-                    <p><strong class="text-slate-800">Outlet Günü:</strong> Neumünster için Deutsche Bahn (DB) üzerinden bölgesel tren bileti gereklidir.</p>
-                    <p><strong class="text-slate-800">Şehir Gezisi Günü:</strong> <span class="font-semibold text-teal-700">HVV Grup Bileti (Gruppenkarte)</span> 5 kişiye kadar geçerlidir ve şehir içi geziler için en ekonomik seçenektir.</p>
-                `,
-                food: `
-                    <p><strong class="text-slate-800">Fischbrötchen:</strong> Taze balık sandviçi. Landungsbrücken iskelesindeki Brücke 10, en otantik yerlerden biridir.</p>
-                `
-            },
-            days: [
-                 {
-                    title: "8. Gün: Varış",
-                    activities: [
-                        { time: "20:00", text: "Hamburg'a varış ve otele yerleşme", icon: "🏨" },
-                        { time: "Akşam", text: "Akşam yemeği: Landungsbrücken'de Fischbrötchen denemesi", icon: "🍴" },
-                    ]
-                },
-                {
-                    title: "9. Gün: Alışveriş",
-                    activities: [
-                        { time: "Tüm Gün", text: "Günübirlik Neumünster Designer Outlet gezisi", icon: "🛍️" },
-                    ]
-                },
-                {
-                    title: "10. Gün: Harikalar",
-                    activities: [
-                        { time: "Sabah", text: "Miniatur Wunderland ziyareti", icon: "🚂" },
-                        { time: "Öğleden Önce", text: "Elbphilharmonie Plaza'dan liman manzarasını izleme", icon: "🎶" },
-                        { time: "16:28", text: "Kopenhag treni için istasyona geçiş (Malmö'ye varış)", icon: "🚉" },
-                    ]
-                },
-            ]
-        },
-        malmo: {
-            name: "Malmö",
-            flag: "🇸🇪",
-            duration: "2 Gece, 2 Gün",
-            dates: "31 Temmuz - 2 Ağustos",
-            hotel: "Best Western Malmo Arena Hotel",
-            sights: "Lilla Torg, Malmöhus Kalesi, Folkets Park",
-            food: "İsveç Köftesi, Kanelbulle",
-            logistics: {
-                transport: `
-                    <p><strong class="text-slate-800">Malmö İçi:</strong> <span class="font-semibold text-teal-700">Skånetrafiken</span> uygulamasını kullanarak bilet alabilirsiniz. Grup indirimi mevcuttur.</p>
-                    <p><strong class="text-slate-800">Havalimanı Ulaşımı:</strong> Malmö Hyllie istasyonundan Kopenhag Havalimanı'na (CPH) direkt tek yönlü tren bileti almanız yeterlidir.</p>
-                `,
-                food: `
-                    <p><strong class="text-slate-800">İsveç Köftesi:</strong> Geleneksel İsveç lezzeti.</p>
-                    <p><strong class="text-slate-800">Kanelbulle:</strong> Meşhur tarçınlı İsveç çöreği.</p>
-                `
-            },
-            days: [
-                 {
-                    title: "10. Gün: Varış",
-                    activities: [
-                        { time: "Akşam", text: "Hamburg'dan varış ve Malmö'deki otele yerleşme", icon: "🏨" },
-                    ]
-                },
-                {
-                    title: "11. Gün: Keşif",
-                    activities: [
-                        { time: "Sabah", text: "Tarihi Lilla Torg Meydanı'nda gezinme", icon: "🏘️" },
-                        { time: "Öğleden Önce", text: "Malmöhus Kalesi ve Akvaryum'u ziyaret", icon: "🏰" },
-                        { time: "Öğle", text: "Öğle yemeği: İsveç Köftesi ve Kanelbulle molası", icon: "🍴" },
-                        { time: "Öğleden S.", text: "Çocuklar için Folkets Park'ta oyun ve eğlence", icon: "🎡" },
-                    ]
-                },
-                {
-                    title: "12. Gün: Dönüş",
-                    activities: [
-                        { time: "Sabah", text: "Otelden ayrılış ve Hyllie İstasyonu'na geçiş", icon: "🚶‍♂️" },
-                        { time: "09:30", text: "Kopenhag Havalimanı'na (CPH) direkt trenle yolculuk (~15 dk)", icon: "🚂" },
-                        { time: "13:00", text: "Dönüş uçuşu", icon: "✈️" },
-                    ]
-                },
-            ]
-        },
-    };
+                 <div class="logistics-card card-belcika">
+                    <h3 class="text-xl font-bold mb-4">Bruges "Weekend Ticket"</h3>
+                    <div class="detail-item">
+                        <div class="detail-icon">📱</div>
+                        <div class="detail-text"><strong>Nereden:</strong> SNCB mobil uygulaması veya istasyon otomatları.</div>
+                    </div>
+                     <div class="detail-item">
+                        <div class="detail-icon">💰</div>
+                        <div class="detail-text"><strong>İpucu:</strong> Cuma 19:00'dan Pazar akşamına kadar %50 indirimli seyahat imkanı sunar. Çocuklar yine ücretsizdir.</div>
+                    </div>
+                </div>
+            </div>
 
-    let durationChart = null;
-
-    document.addEventListener('DOMContentLoaded', () => {
-        const mainNav = document.getElementById('main-nav');
-        const mainContent = document.getElementById('main-content');
-        
-        Object.keys(travelData).forEach((cityKey, index) => {
-            const city = travelData[cityKey];
-            const navLink = document.createElement('li');
-            navLink.innerHTML = `<a href="#" data-city="${cityKey}" class="nav-link font-semibold text-slate-600 hover:text-teal-600 p-2 md:p-3 border-b-2 border-transparent">${city.flag} ${city.name}</a>`;
-            mainNav.appendChild(navLink);
-        });
-
-        mainNav.addEventListener('click', e => {
-            e.preventDefault();
-            const targetLink = e.target.closest('a');
-            if (targetLink && targetLink.dataset.city) {
-                const cityKey = targetLink.dataset.city;
-                renderCity(cityKey);
-
-                document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-                targetLink.classList.add('active');
-            }
-        });
-
-        renderCity(Object.keys(travelData)[0]);
-        mainNav.querySelector('a').classList.add('active');
-    });
-
-    function renderCity(cityKey) {
-        const city = travelData[cityKey];
-        const mainContent = document.getElementById('main-content');
-        const template = document.getElementById('city-template');
-        
-        const clone = template.content.cloneNode(true);
-
-        clone.querySelector('.city-flag').textContent = city.flag;
-        clone.querySelector('.city-name').textContent = city.name;
-        clone.querySelector('.city-dates').textContent = city.dates;
-        clone.querySelector('.city-hotel').textContent = city.hotel;
-        clone.querySelector('.city-sights').textContent = city.sights;
-        clone.querySelector('.city-food').textContent = city.food;
-
-        const cityTabsContainer = clone.getElementById('city-tabs');
-        
-        city.days.forEach((day, index) => {
-            const tabLink = document.createElement('a');
-            tabLink.href = '#';
-            tabLink.dataset.tab = `day-${index}`;
-            tabLink.className = 'tab-link shrink-0 border-b-2 border-transparent px-3 py-2 text-sm font-medium text-slate-500 hover:border-slate-300 hover:text-slate-700';
-            tabLink.textContent = day.title;
-            cityTabsContainer.appendChild(tabLink);
-        });
-        
-        const logisticsTabLink = document.createElement('a');
-        logisticsTabLink.href = '#';
-        logisticsTabLink.dataset.tab = 'logistics';
-        logisticsTabLink.className = 'tab-link shrink-0 border-b-2 border-transparent px-3 py-2 text-sm font-medium text-slate-500 hover:border-slate-300 hover:text-slate-700';
-        logisticsTabLink.textContent = 'Lojistik & İpuçları';
-        cityTabsContainer.appendChild(logisticsTabLink);
-
-        mainContent.innerHTML = '';
-        mainContent.appendChild(clone);
-        
-        renderTabContent(cityKey, 'day-0');
-        const cityTabsFirstLink = document.querySelector('#city-tabs a');
-        if (cityTabsFirstLink) {
-            cityTabsFirstLink.classList.add('active', 'bg-teal-600', 'text-white', 'rounded-t-md');
-            cityTabsFirstLink.classList.remove('border-b-2', 'border-transparent', 'text-slate-500');
-        }
-
-        const cityTabs = document.getElementById('city-tabs');
-        cityTabs.addEventListener('click', e => {
-            e.preventDefault();
-            const targetTab = e.target.closest('a');
-            if (targetTab && targetTab.dataset.tab) {
-                renderTabContent(cityKey, targetTab.dataset.tab);
+            <!-- Almanya Bölümü -->
+            <div class="country-section" style="border-color: #06D6A0;">
+                <h2 class="text-3xl font-bold mb-6 text-[#06D6A0]">🇩🇪 Almanya (27-31 Temmuz)</h2>
                 
-                cityTabs.querySelectorAll('a').forEach(tab => {
-                    tab.classList.remove('active', 'bg-teal-600', 'text-white', 'rounded-t-md');
-                    tab.classList.add('border-b-2', 'border-transparent', 'text-slate-500');
-                });
-                targetTab.classList.add('active', 'bg-teal-600', 'text-white', 'rounded-t-md');
-                targetTab.classList.remove('border-b-2', 'border-transparent', 'text-slate-500');
-            }
-        });
-        
-        initDurationChart();
-    }
-    
-    function renderTabContent(cityKey, tabId) {
-        const city = travelData[cityKey];
-        const tabContentContainer = document.getElementById('city-tab-content');
-        tabContentContainer.innerHTML = '';
-        
-        if (tabId === 'logistics') {
-            const logisticsTemplate = document.getElementById('logistics-template');
-            const logisticsClone = logisticsTemplate.content.cloneNode(true);
-            logisticsClone.querySelector('.transport-info').innerHTML = city.logistics.transport;
-            logisticsClone.querySelector('.food-recommendations').innerHTML = city.logistics.food;
-            tabContentContainer.appendChild(logisticsClone);
-        } else {
-            const dayIndex = parseInt(tabId.split('-')[1]);
-            const day = city.days[dayIndex];
-            const dayPlanTemplate = document.getElementById('day-plan-template');
-            const dayClone = dayPlanTemplate.content.cloneNode(true);
-            const dayPlanContainer = dayClone.querySelector('.day-plan');
-
-            day.activities.forEach(activity => {
-                const activityEl = document.createElement('div');
-                activityEl.className = 'flex items-start p-3 bg-slate-50 rounded-lg';
-                const randomId = `activity-${Math.random().toString(36).substr(2, 9)}`;
-                activityEl.innerHTML = `
-                    <div class="flex items-center mr-4">
-                        <input id="${randomId}" type="checkbox" class="h-5 w-5 rounded border-gray-300 text-teal-600 focus:ring-teal-500">
+                <div class="logistics-card card-almanya">
+                    <h3 class="text-xl font-bold mb-4">KölnCard (Grup)</h3>
+                     <div class="detail-item">
+                        <div class="detail-icon">🎫</div>
+                        <div class="detail-text"><strong>Adet:</strong> 2 adet (Her biri 5 kişiye kadar geçerli, 48 saatlik)</div>
                     </div>
-                    <div class="flex-1">
-                        <label for="${randomId}" class="flex items-center cursor-pointer">
-                            <span class="text-xl mr-3">${activity.icon}</span>
-                            <div>
-                                <p class="font-semibold text-slate-800">${activity.text}</p>
-                                <p class="text-sm text-slate-500">${activity.time}</p>
-                            </div>
-                        </label>
+                    <div class="detail-item">
+                        <div class="detail-icon">💻</div>
+                        <div class="detail-text"><strong>Nereden:</strong> Köln Turizm'in resmi web sitesinden (koelntourismus.de) online olarak alın.</div>
                     </div>
-                `;
-                dayPlanContainer.appendChild(activityEl);
-            });
-            tabContentContainer.appendChild(dayClone);
-        }
-    }
-    
-    function initDurationChart() {
-        if (durationChart) {
-            durationChart.destroy();
-        }
-        const ctx = document.getElementById('duration-chart').getContext('2d');
-        const labels = Object.values(travelData).map(city => city.name);
-        const data = Object.values(travelData).map(city => city.days.length);
+                     <div class="detail-item">
+                        <div class="detail-icon">💡</div>
+                        <div class="detail-text"><strong>İpucu:</strong> Online aldığınızda biletiniz e-posta ile gelir. Telefonunuzda dijital olarak veya çıktısını alarak kullanabilirsiniz.</div>
+                    </div>
+                </div>
 
-        durationChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Gün Sayısı',
-                    data: data,
-                    backgroundColor: [
-                        '#14b8a6', // teal-500
-                        '#2dd4bf', // teal-400
-                        '#5eead4', // teal-300
-                        '#99f6e4', // teal-200
-                        '#ccfbf1'  // teal-100
-                    ],
-                    borderColor: '#ffffff',
-                    borderWidth: 3
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            font: {
-                                family: 'Inter'
-                            },
-                            boxWidth: 15,
-                            padding: 20,
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed !== null) {
-                                    label += context.parsed + ' gün';
-                                }
-                                return label;
-                            }
-                        }
-                    }
-                },
-                cutout: '60%'
-            }
-        });
-    }
+                <div class="logistics-card card-almanya">
+                    <h3 class="text-xl font-bold mb-4">Schleswig-Holstein-Ticket</h3>
+                     <div class="detail-item">
+                        <div class="detail-icon">🎫</div>
+                        <div class="detail-text"><strong>Adet:</strong> 2 adet (Her biri 5 kişiye kadar geçerli)</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-icon">🚉</div>
+                        <div class="detail-text"><strong>Nereden:</strong> Herhangi bir tren istasyonu otomatı (DB) veya DB Navigator uygulaması.</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-icon">⏰</div>
+                        <div class="detail-text"><strong>İpucu:</strong> Hafta içi günlerde sabah 09:00'dan sonra geçerli olur. Bölgesel trenlerde kullanılır.</div>
+                    </div>
+                </div>
 
-    </script>
+                 <div class="logistics-card card-almanya">
+                    <h3 class="text-xl font-bold mb-4">Hamburg 9-Uhr-Gruppenkarte</h3>
+                     <div class="detail-item">
+                        <div class="detail-icon">🎫</div>
+                        <div class="detail-text"><strong>Adet:</strong> 2 adet (Her biri 5 kişiye kadar geçerli)</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-icon">📱</div>
+                        <div class="detail-text"><strong>Nereden:</strong> HVV mobil uygulaması veya web sitesinden online olarak.</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-icon">💰</div>
+                        <div class="detail-text"><strong>İpucu:</strong> Bu bilet, sabah 9'dan sonra seyahat edecek gruplar için en ekonomik seçenektir.</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Gündemdeki Konular Bölümü -->
+            <div class="country-section" style="border-color: #8B5CF6; border-bottom: none;">
+                <h2 class="text-3xl font-bold mb-6 text-[#8B5CF6]">🤔 Gündemdeki Konular</h2>
+
+                <div class="logistics-card card-gundem">
+                    <h3 class="text-xl font-bold mb-4">Değerlendirilmesi Gereken Konular</h3>
+                    <div class="detail-item">
+                        <div class="detail-icon">🏨</div>
+                        <div class="detail-text"><strong>Brüksel Otel Konumu:</strong> ibis budget Hotel Brussels Airport (Diegem) lokasyonu çok kötü. Şehir merkezindeki bir otel ile değiştirme fikri.</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-icon">💰</div>
+                        <div class="detail-text"><strong>Kopenhag/Malmö Karşılaştırması:</strong> Malmö'de değil de Kopenhag'da kalırsak 140 euro kârlıyız. 4 yetişkin 4 çocuk Kopenhag-Malmö gidiş geliş 70 euro.</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <footer class="text-center mt-8 text-gray-500 text-sm">
+            <p>Bu kılavuz, Rıdvan Avcı Tur Şirketi tarafından düzenlenen Avrupa Turu'nun lojistik planlamasını içermektedir.</p>
+        </footer>
+
+    </div>
+
 </body>
 </html>
